@@ -52,6 +52,21 @@
 **สำหรับ solo builder ที่ไม่ได้มาจาก programming:**
 > "AI สร้างโค้ดที่ดูทำงานได้ — แต่หลังบ้านมี hallucination, ไม่มี backup, ไม่ผ่าน privacy law, ไม่รอด app store review, และเจ้าของไม่รู้ตัวจนกว่าจะ deploy"
 
+### 🆕 The 4 AI Misbehaviors Framework (v3.1.0)
+
+ทุก pattern ใน Codex map กลับมาที่ 4 พฤติกรรมพื้นฐานของ AI ที่ทำให้ project พัง:
+
+| พฤติกรรม | Code-level symptom | Pattern ที่กัน |
+|---|---|---|
+| **เดา** (Guess) | Hallucinated imports/APIs, สร้าง field/method ที่ไม่มี | P-23, NO MAGIC rule |
+| **โกหก** (Lie) | "เสร็จแล้ว" โดยไม่ verify, ไม่ run จริง | VERIFY BEFORE DONE rule |
+| **ทำเกิน** (Overreach) | Scope creep, refactor ที่ไม่ได้ขอ, "ขอเพิ่มอีกนิด" | P-21, SCOPE DRIFT rule, P-31 |
+| **ลืม** (Forget) | Session ถัดไปไม่รู้บริบท, repeat bug เดิม | MEMORY.md, CAPTURE_LOG, P-26 |
+
+> **กฎทอง:** ก่อนเขียน pattern ใหม่ ถาม "นี่กันพฤติกรรมไหนใน 4 อย่างนี้?" ถ้าตอบไม่ได้ → pattern ยังไม่ครบ
+>
+> Framework นี้ adopt มาจาก `somnus0x/agt-skill-pack/claude-md-setup` — รายละเอียดใน §10
+
 Codex นี้คือชุด patterns ที่ทำให้:
 1. ✅ ทุก silent failure ดังขึ้น — เจ้าของระบบเห็นก่อน user ร้อง (P-01, P-14)
 2. ✅ บทเรียน 1 bug ไม่เกิดซ้ำข้าม project (Compounding Loop)
@@ -450,6 +465,65 @@ Pass 2: AI agent #2 (instance ใหม่, ไม่เห็น context กา
 
 **กฎ:** Reviewer ห้ามเป็น AI ตัวเดียวกับที่เขียน + ห้าม share context window — ไม่งั้นมัน rationalize ของตัวเอง
 
+#### 🆕 P-31: R0/R1/R2 Reversibility Classification (v3.1.0)
+
+**The bug pattern:** AI agent ทุกตัวมี 2 mode สุดขั้ว — ถามทุกอย่าง (annoying + slow) หรือทำทุกอย่าง (dangerous) ไม่มี **gradient** ระหว่างนั้น → solo builder หงุดหงิดที่ต้อง confirm trivial action หรือกลัวที่ agent ตัดสินใจ irreversible เอง
+
+**Solution: ทุก action จัดประเภทตาม "reversibility" 3 ระดับ:**
+
+| Class | ความหมาย | ตัวอย่าง | กฎ |
+|---|---|---|---|
+| **R0** | Irreversible | `rm -rf`, `git push --force`, drop database, revoke API key, ลบ user data, signing key rotation, store submission live | **STOP. ห้ามทำเลย. ถามก่อนทุกครั้ง** |
+| **R1** | Costly to reverse | DB schema change, breaking API change, dependency major version bump, deploy production, public commit ที่ visible | **Do it, but report ทันที** — อธิบายสิ่งที่ทำ + reasoning + วิธี rollback |
+| **R2** | Easily reversed | Edit local file, restart server, run test, format code, install dev dep, edit comment | **Just do it.** ไม่ต้องถาม report สั้นๆ |
+
+**ตัวอย่าง R0/R1/R2 ใน solo builder context:**
+
+```
+R0 (ต้องถามก่อน):
+  ❌ Delete production data
+  ❌ Revoke credential ก่อนทดสอบของใหม่ (ดู P-07)
+  ❌ Force-push ทับ main branch
+  ❌ Upload signing key ใหม่ (ทำให้ key เก่าใช้ไม่ได้)
+  ❌ Submit app version ใหม่ลง Play Store
+  ❌ ปิด account / delete repo
+
+R1 (ทำได้ แต่ report ทันที):
+  ⚠️ DB migration (มี rollback แต่เสียเวลา)
+  ⚠️ Update dependency major version
+  ⚠️ Refactor ที่ touch หลายไฟล์
+  ⚠️ Deploy ไป staging/production
+  ⚠️ Push commit ขึ้น remote (visible แล้ว)
+
+R2 (ทำเลย):
+  ✅ Edit comment / docstring
+  ✅ Rename variable ใน scope เดียว
+  ✅ Run lint / format
+  ✅ Run test suite
+  ✅ Install dev dependency
+  ✅ Edit README typo
+  ✅ Edit ไฟล์ที่ยังไม่ commit
+```
+
+**ใส่ใน AGENTS.md เป็น standing rule:**
+```markdown
+### REVERSIBILITY CLASSIFICATION (R0/R1/R2)
+ก่อนทำ action ใดๆ จัดประเภทก่อน:
+- R0 (irreversible): STOP. Ask before proceeding.
+- R1 (costly to reverse): Do it, but report what + why + how to rollback.
+- R2 (easily reversed): Just do it. Brief report only.
+```
+
+**ทำไม pattern นี้สำคัญสำหรับ solo:**
+- ไม่มี QA ทีม → ทุก action อยู่บนตัวเอง
+- ไม่มี code reviewer → AI agent ทำผิด = ไม่มี second line
+- R0/R1/R2 ทำให้ agent **ฉลาดเลือก** ว่าเมื่อไหร่ถาม เมื่อไหร่ลุย → ลด friction โดยไม่เสีย safety
+
+**Anti-pattern (สิ่งที่ห้ามทำ):**
+- ❌ AI ถาม "should I proceed?" ทุก trivial edit (annoying — ฝึก AI ให้รู้ว่า R2 ลุยเลย)
+- ❌ AI ทำ R0 โดยไม่ถาม (อันตราย — ฝึก AI ให้ identify R0 + ถามเสมอ)
+- ❌ จัดประเภทตาม "ขนาด" ของงาน → ผิด ต้องจัดตาม **reversibility**
+
 ---
 
 ## 📦 Standard Files for Every Project
@@ -459,20 +533,36 @@ Pass 2: AI agent #2 (instance ใหม่, ไม่เห็น context กา
 ├── (source files ตาม stack)
 ├── README.md                 ← project นี้ทำอะไร / วิธี run / deploy
 ├── AGENTS.md                 ← Tier 1: agent entry point (<150 lines) — link มา Codex
-├── CAPTURE_LOG.md            ← compounding loop captures
+├── MEMORY.md                 ← 🆕 v3.1: AI's failure log (AI เขียนเอง — operational)
+├── CAPTURE_LOG.md            ← Human's learning log (strategic, cross-session)
+├── spec.md                   ← 🆕 v3.1: Project-level save point (Architecture + Done + Todo + Current state)
 ├── AI_LOCK.md                ← multi-agent coordination (P-20) — ถ้าใช้ agent หลายตัว
 ├── DEPLOY_CHECKLIST.md       ← pre-deploy (อ้างจาก Codex)
 ├── PRIVACY_POLICY.md         ← P-28 source of truth (ถ้ามี user data)
-├── skills/                   ← Tier 2: portable skills (per project ที่ specific)
+├── DR_PLAN.md                ← P-24 disaster recovery
+├── skills/                   ← Tier 2: portable skills
 │   └── {skill-name}/SKILL.md
 └── features/
     └── {feature-XYZ}/
-        ├── SPEC.md           ← P-29
+        ├── SPEC.md           ← P-29 — per-feature spec (≠ project-level spec.md)
         ├── PLAN.md
         └── TASKS.md
 ```
 
 > ไม่จำเป็นต้องมีทุกไฟล์ — เลือกตามความซับซ้อน project เล็กข้าม `AI_LOCK.md`, `skills/`, `features/` ได้
+
+### 🆕 File Job Clarification (v3.1.0)
+
+**MEMORY.md vs CAPTURE_LOG.md vs spec.md** — สามไฟล์ทำคนละหน้าที่ ห้ามรวม:
+
+| File | ใครเขียน | อะไร | Scope |
+|---|---|---|---|
+| `MEMORY.md` | **AI agent** | Operational mistakes (3-field: what / root cause / correct behavior) | Per-project, append-only |
+| `CAPTURE_LOG.md` | **Human (พี่)** | Strategic learnings, pattern observations, Win/Loss/Question→Decision | Per-project, ทบทวน quarterly |
+| `spec.md` | **AI maintains, human reviews** | Architecture + Done (with why) + Todo + **Current state** (save point) | Project-level, update ทุก task |
+| `features/XYZ/SPEC.md` | Human + AI co-author | Per-feature requirement + acceptance criteria | Per-feature (one folder per feature) |
+
+> **Mental model:** MEMORY = "AI ผิดอะไรห้ามผิดซ้ำ" / CAPTURE = "เราได้บทเรียนอะไร" / spec.md = "ตอนนี้อยู่ตรงไหน" / SPEC.md = "feature นี้design ยังไง"
 
 ---
 
@@ -577,6 +667,15 @@ Codex v3.0 สังเคราะห์จาก:
 
 5. **PDPA Thailand:** พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล 2562 + PDPC interpretation 2024-2026 + TPQI/DEPA DPO standards — เป็นที่มาของ P-28
 
+6. **🆕 Behavioral guardrails (v3.1.0):** `somnus0x/agt-skill-pack/claude-md-setup` — เป็นที่มาของ:
+   - **The 4 AI Misbehaviors Framework** (เดา / โกหก / ทำเกิน / ลืม) ใน Executive Summary
+   - **P-31 R0/R1/R2 Reversibility Classification**
+   - **MEMORY.md schema** (3-field: what / root cause / correct behavior) — แยกจาก CAPTURE_LOG
+   - **project-level spec.md** (Architecture / Done / Todo / Current state) — แยกจาก feature-level SPEC.md
+   - **Data Contracts block** ใน AGENTS.md template
+   
+   These concepts addressed behavioral gaps in earlier Codex versions that focused primarily on technical patterns. Builder Codex is now a synthesis of: incident-derived technical patterns (P-01..P-30) + behavioral guardrails from somnus0x's work + 2026 industry standards.
+
 Codex นี้เป็น **living document** — ต้องผ่าน Compounding Loop ของตัวเองเพื่อให้คุ้มค่าใช้งานในระยะยาว
 
 ---
@@ -585,12 +684,11 @@ Codex นี้เป็น **living document** — ต้องผ่าน Com
 
 | Version | Date | Highlights |
 |---|---|---|
-| **v3.0 (Solo-Survival Edition)** | 2026-06-20 | + Three-Tier file architecture (AGENTS/SKILL/Codex); + P-23 Hallucination Guardrails; + P-24 Backup Discipline; + P-25 Cost/Token Budget; + P-26 Context Management; + P-27 Mobile Store; + P-28 PDPA; + P-29 Spec-Driven Artifacts; + P-30 AI Second Reviewer; condensed P-01..P-22 to make room; expanded §10 with 2026 standards landscape |
+| **v3.1.0 (Behavioral Guardrails)** | 2026-06-22 | + 4 AI Misbehaviors Framework (เดา/โกหก/ทำเกิน/ลืม) ใน Executive Summary; + P-31 R0/R1/R2 Reversibility Classification; + MEMORY.md template (AI's failure log, แยกจาก CAPTURE_LOG); + project-level spec.md template (Architecture/Done/Todo/Current state); + Data Contracts block ใน AGENTS.md; + File Job Clarification section; credit somnus0x/agt-skill-pack ใน §10 |
+| v3.0.1 | 2026-06-20 | + CAPTURE_LOG.md template with real examples; + DR_PLAN.md with 7 scenarios |
+| **v3.0 (Solo-Survival Edition)** | 2026-06-20 | + Three-Tier file architecture (AGENTS/SKILL/Codex); + P-23 Hallucination Guardrails; + P-24 Backup Discipline; + P-25 Cost/Token Budget; + P-26 Context Management; + P-27 Mobile Store; + P-28 PDPA; + P-29 Spec-Driven Artifacts; + P-30 AI Second Reviewer; condensed P-01..P-22; expanded §10 with 2026 standards landscape |
 | v2.0 (Global Edition) | 2026-06-19 | ตัดชื่อ app/ธุรกิจเฉพาะออก; 4-step Plan→Work→Review→Compound; §10 Acknowledgements ครั้งแรก |
 | v1.0 | 2026-06-18 | รวม Compounding Loop 3-step; CAPTURE_LOG.md standard |
-| Sync Codex 3.0 | 2026-06-18 | + P-21 + P-22 |
-| Sync Codex 2.0 | 2026-06-18 | + P-13..P-20 |
-| Sync Codex 1.0 | 2026-06-14 | Original P-01..P-12 |
 
 ---
 
