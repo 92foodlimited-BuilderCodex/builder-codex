@@ -598,6 +598,7 @@ R2 (ทำเลย):
 - [ ] Signing key backup
 
 ### 🆕 Privacy (P-28) — ถ้ามี user data
+- [ ] `npx pdpa-guard .` ผ่าน (region, security rules เปิดกว้าง, PII fields, subprocessors — https://npmjs.com/package/pdpa-guard)
 - [ ] Data minimization audited
 - [ ] Consent flow + log working
 - [ ] Right to access/deletion implemented
