@@ -58,30 +58,36 @@ Adopted from `somnus0x/agt-skill-pack/claude-md-setup`:
 ## How to Install in a New Project
 
 ```bash
-# 1. Copy bundle to project root
-cd ~/projects/your-project
-cp -r ~/builder-codex/AGENTS.md .
-cp -r ~/builder-codex/BUILDER_CODEX.md .
-cp -r ~/builder-codex/MEMORY.md .
-cp -r ~/builder-codex/spec.md .
-cp -r ~/builder-codex/CAPTURE_LOG.md .
-cp -r ~/builder-codex/DR_PLAN.md .
-cp -r ~/builder-codex/skills .
+npx @maya4art/builder-codex init
+```
 
-# 2. Customize 5 files (search for [Project Name] and replace)
-#    - AGENTS.md (stack + commands)
-#    - MEMORY.md (project name)
-#    - spec.md (project name + goal)
-#    - CAPTURE_LOG.md (project name)
-#    - DR_PLAN.md (project name + inventory)
+คำสั่งเดียว — ติดตั้งไฟล์ทั้งหมดลง project root ทันที ไม่ต้อง clone repo
 
-# 3. Commit
+**หลังติดตั้ง ทำ 3 อย่างนี้:**
+
+```bash
+# 1. Customize ไฟล์หลัก (search [Project Name] แล้วแทนชื่อจริง)
+#    - AGENTS.md       → stack, run commands, project name
+#    - spec.md         → project goal + current state
+#    - MEMORY.md       → project name
+#    - CAPTURE_LOG.md  → project name
+#    - DR_PLAN.md      → project name + inventory
+
+# 2. Commit
 git add .
 git commit -m "chore: install Builder Codex v3.1.0"
 
-# 4. AI agent (Claude Code, Cursor, Codex CLI, Windsurf, etc.) จะอ่าน AGENTS.md
-#    + imported MEMORY.md + CAPTURE_LOG.md อัตโนมัติทุก session
+# 3. AI agent จะอ่าน AGENTS.md + MEMORY.md + CAPTURE_LOG.md อัตโนมัติทุก session
+#    (Claude Code, Cursor, Codex CLI, Windsurf, Gemini CLI, GitHub Copilot ฯลฯ)
 ```
+
+**ก่อน deploy ทุกครั้ง:**
+
+```bash
+npx pdpa-guard .    # PDPA compliance scan (P-28) — region, security rules, PII fields
+```
+
+npm: https://www.npmjs.com/package/@maya4art/builder-codex
 
 ## Tools ที่อ่าน AGENTS.md อัตโนมัติ (2026)
 
