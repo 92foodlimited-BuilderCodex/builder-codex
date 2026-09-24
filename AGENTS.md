@@ -2,10 +2,6 @@
 > Entry point for AI coding agents. <150 lines by design.
 > Full reference → `BUILDER_CODEX.md` (Tier 3 master) + `skills/` (Tier 2 on-demand)
 
-## Imports (load every session)
-@MEMORY.md
-@CAPTURE_LOG.md
-
 ## Project
 **Stack:** Single-file HTML/JS + Firebase Realtime Database (asia-southeast1) + Cloudflare Workers
 **Build system:** None (vanilla) — เปิด HTML file ใน browser run ได้เลย
