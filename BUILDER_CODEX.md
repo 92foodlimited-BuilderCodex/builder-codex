@@ -1,3 +1,8 @@
+---
+name: builder-codex
+description: Apply Builder Codex patterns for AI-assisted solo development — reversibility (R0/R1/R2), spec-driven Grilling workflow, structural-integrity edit gates, and the 4 AI Misbehaviors framework. Use when writing, reviewing, or planning code changes.
+---
+
 # Builder Codex
 ## Global Standard for AI-Native Solo / Small-Team Development
 
