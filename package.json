@@ -1,6 +1,6 @@
 {
   "name": "@maya4art/builder-codex",
-  "version": "3.1.0",
+  "version": "3.3.0",
   "description": "Solo-survival + behavioral guardrails standards bundle for AI-assisted development. Installs AGENTS.md, BUILDER_CODEX.md, skills/, and supporting files into your project root.",
   "license": "MIT",
   "type": "commonjs",
