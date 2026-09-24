@@ -1,5 +1,61 @@
 # Changelog
 
+<!--
+วิธีใช้ไฟล์นี้: เปิด CHANGELOG.md ตัวจริงใน repo แล้ว paste เนื้อหาด้านล่าง (ตั้งแต่ "## [3.3.0]"
+ถึงก่อน "## [3.1.0]") แทรกไว้เหนือบรรทัด "## [3.1.0] - 2026-06-22 — Behavioral Guardrails Edition"
+เพราะ repo live ปัจจุบันค้างอยู่ v3.1.0 — v3.2.0 ไม่เคยถูก push มาก่อน ต้องใส่ทั้งคู่เรียงตามจริง
+ลบ comment block นี้ทิ้งก่อน save ไฟล์จริง
+-->
+
+## [3.3.0] - 2026-09-24 — Grilling Edition
+
+### Added (from `mattpocock/skills`, extended by `utarn/engineer-skills`)
+
+- **Grilling method** formalized inside `/clarify` step of P-29 — design tree + frontier rounds, numbered question + recommended answer format, agent-finds-facts-itself rule, never act until frontier is empty
+- **BUILDER_CODEX_INDEX.md** — token-efficient companion index (~150 lines), committed to repo for the first time
+
+### Changed
+
+- P-29 (Spec → Plan → Tasks Artifacts): `/clarify` sub-step now has a concrete mechanism instead of a one-line prose instruction
+- Trimmed the 8-slash-command box and OpenSpec 3-phase description to net-offset the addition (Growth Discipline — every addition must reduce something else)
+- §10 Acknowledgements: added credit for `mattpocock/skills` (original) and `utarn/engineer-skills` (fork that extends it)
+
+### Fixed
+
+- Provenance correction: an earlier internal note attributed the Grilling technique to `utarn/engineer-skills`; the primary source is `mattpocock/skills` — utarn is a fork that extends it (adds `grill-with-docs`, `grill-novice`, `handoff`, `domain-modeling`)
+
+### Retired
+
+- **P-37 candidate number** — the "Grilling Before Implementation" candidate (parked since the utarn discovery session) is folded into P-29 instead of becoming a standalone pattern; it is a definition of `/clarify`, not a separate discipline
+
+### Real incident anchor
+
+- Session 8 (2026-06-25): Nova answered off Tony's question 3 times in a row and proposed a counter-option ("Option A++") instead of answering what was asked — exactly the failure the frontier-round-with-recommended-answer format is designed to prevent
+
+---
+
+## [3.2.0] - 2026-09-23 — Structural Integrity Edition
+
+> **Note:** this version was merged locally but never pushed to this repo before v3.3.0 — added here retroactively so the changelog stays accurate. See `META_CAPTURE_LOG.md` Session 7-9 for the incidents behind it.
+
+### Added
+
+- **P-32: Structure-Read Gate** — read a component's source body before any brief that moves/merges/deletes it; every brief carries a `Structure verified:` header with function/DOM + line numbers (from the Pippa "Safety tab" mischaracterization incident, 2026-07-20)
+- **P-33: No-Regenerate / Encoding-Safe Edit Gate** — never regenerate a whole file; targeted `str_replace` only, with `assert count==1` before each replace (from the Pippa Antigravity mojibake scare, 2026-07-21)
+- **P-34: Nova-Reference Byte-Diff Acceptance Gate** — acceptance = byte-diff against a pre-built reference, not the coding agent's self-reported metrics (proven 3/3 on real deliveries)
+- **P-35: Coding-Agent Env-Note Header** — every brief states the target agent's environment quirks (PowerShell fallback, skip `node --check`, etc.) up front
+- **P-36: Goal-Lock & Minimal Footprint** (ALWAYS ON) — restate the origin goal before any proposal; footprint declaration before any new infra/dep/hosting/auth/domain
+
+### Changed
+
+- Pattern Library expanded from 31 → 36 patterns
+- §10 Acknowledgements: numbering note added — P-32/P-33 were referred to as P-31/P-32 in working memory before this version locked P-31 to Reversibility Classification
+
+### Architecture
+
+- Builder Codex is now a synthesis of: incident-derived technical patterns (P-01..P-30) + behavioral guardrails (P-31, somnus0x) + structural-integrity gates (P-32..P-36, cross-tool coding-agent handoff lessons) + 2026 industry standards
+
+
 ## [3.1.0] - 2026-06-22 — Behavioral Guardrails Edition
 
 ### Added (adopted from `somnus0x/agt-skill-pack/claude-md-setup`)

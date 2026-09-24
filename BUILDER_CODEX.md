@@ -3,8 +3,10 @@
 
 > **เอกสารหลัก** สำหรับทุกคนที่ build ด้วย AI 100% (vibe coding / agentic coding) — ข้าม project, ข้าม tech stack, ข้าม AI tool
 >
-> **เวอร์ชัน:** 3.0 (Solo-Survival Edition)
-> **อัพเดทล่าสุด:** 2026-06-20
+> **เวอร์ชัน:** 3.3.0 (Grilling Edition)
+> **อัพเดทล่าสุด:** 2026-09-24
+> **v3.3.0 highlights:** P-29's `/clarify` step formalized with the Grilling method (design tree + frontier rounds, numbered question + recommended answer, agent-finds-facts) — จาก `mattpocock/skills`, ต่อยอดโดย `utarn/engineer-skills`. Real incident anchor: Session 8 Nova counter-propose แทนตอบตามที่ขอ. P-37 candidate number retired — folded into P-29 แทนเปิดเลขใหม่ (Growth Discipline: ตัด slash-command box + OpenSpec 3-phase ให้สั้นลงชดเชย)
+> **v3.2.0 highlights:** Pattern P-32 → P-36 (Structure-Read, Encoding-Safe, Nova-Reference Byte-Diff, Env-Note, Goal-Lock) — เกิดจากบทเรียนจริง Pippa B-1/B-1b + cross-tool session drift
 > **ที่มา:** สังเคราะห์จากบทเรียนจริงของ solo builder หลาย sprint + เทียบกับ 2026 standards (AGENTS.md Linux Foundation, Anthropic SKILL spec, Spec-Driven Development, Claude Code memory hierarchy) — ดู §10
 > **Applies to:** ทุก project ที่ใช้ AI agent เขียนโค้ดเป็นหลัก — ไม่ว่าจะเป็น single-file app, multi-file repo, mobile app, หรือ cross-platform
 > **เพิ่มใน v3.0:** Pattern P-23 → P-30 สำหรับ Solo Builder (hallucination, backup, cost, context, mobile, PDPA, spec workflow, AI reviewer) + Three-tier file architecture (AGENTS.md / SKILL.md / Codex master)
@@ -410,18 +412,23 @@ rsync -av ~/projects/ /Volumes/Backup/
 
 **The bug pattern:** AI ทำตาม prompt แต่ drift ออกจาก intent — "ดูเหมือนถูก" แต่แก้คนละปัญหา ไม่มี artifact ที่จับต้องได้ระหว่างทาง → ไม่มีอะไรเทียบ
 
-**2026 standard workflow** (GitHub Spec Kit, AWS Kiro, OpenSpec ใช้ pattern เดียวกัน):
+**2026 standard workflow** (GitHub Spec Kit / AWS Kiro / OpenSpec, solo builder ไม่ต้องครบ): `/constitution → /specify → /clarify → /plan → /tasks → /analyze → /implement → /checklist`
 
-```
-/constitution  → กฎประจำ project (= AGENTS.md ของพี่)
-/specify       → SPEC.md: requirement + acceptance criteria (GIVEN/WHEN/THEN)
-/clarify       → ถามจน ambiguity หมด ก่อนเขียน plan
-/plan          → PLAN.md: architecture decision + file ที่จะแก้
-/tasks         → TASKS.md: atomic checklist
-/analyze       → conflict / gap check
-/implement     → เขียนโค้ด
-/checklist     → review against spec
-```
+**`/clarify` = Grilling** — จุดที่ drift เกิดบ่อยสุดเพราะเดิมไม่มี format จริง แค่บอก "ถามจน ambiguity หมด" ลอยๆ
+
+**Real incident (Session 8, 2026-06-25):** Nova ตอบไม่ตรงคำถาม Tony 3 ครั้งติด + propose "Option A++" counter แทนตอบตาม Option B ที่ Tony ขอ — เดา/counter-propose แทนที่จะถามเป็นชุดแล้วรอ confirm ก่อนลงมือ
+
+**Rule — Grilling method** (ต้นทาง `mattpocock/skills` skill `grilling`, `utarn/engineer-skills` fork ต่อยอดเป็น `grill-me`/`grill-with-docs`/`grill-novice`):
+1. Map เป็น **design tree** — decision ทุกตัวแตกเป็น decision ย่อยที่ขึ้นกับมัน
+2. ถามเป็น **rounds** — เฉพาะ **frontier** (คำถามที่ prerequisite settled แล้ว ไม่ถามที่ต้องเดาคำตอบที่ยังไม่รู้)
+3. ถามทั้ง frontier ในรอบเดียว มีเลขคำถาม + คำตอบแนะนำเสมอ:
+   ```
+   ❓ Q1 — <หัวข้อ>: <รายละเอียด/ตัวเลือก>
+   ➡️ <คำตอบที่แนะนำ>
+   ```
+4. Fact ที่หาเองได้ (code/docs/filesystem) → **agent หาเอง ห้ามถาม user** — user ตอบเฉพาะ decision จริง
+5. ตอบแล้ว recompute frontier รอบใหม่
+6. จบเมื่อ frontier ว่าง — **ห้ามลงมือจนกว่า user confirm shared understanding**
 
 **Artifact files per feature:**
 ```
@@ -433,12 +440,9 @@ features/
     REVIEW.md     ← post-implementation check
 ```
 
-**OpenSpec 3-phase (ลด AI drift):**
-- **Proposal** → SPEC + PLAN, ยังไม่เขียนโค้ด, human review ก่อน
-- **Apply** → implement ตาม proposal
-- **Archive** → merge แล้ว spec กลายเป็น part of canon
+**OpenSpec 3-phase (ลด drift):** Proposal (SPEC+PLAN, human review ก่อน) → Apply (implement) → Archive (merge เป็น canon)
 
-**สำหรับ solo builder:** ไม่ต้องครบทุก slash command — เริ่มจาก SPEC.md + TASKS.md ก็พอ แต่ต้องมี artifact ให้ AI อ้างกลับ ไม่ใช่ prompt-only
+**สำหรับ solo builder:** ไม่ต้องครบทุก slash command — SPEC.md + TASKS.md + Grilling round ก่อนเขียน SPEC ก็พอ แต่ต้องมี artifact ให้ AI อ้างกลับ ไม่ใช่ prompt-only
 
 #### P-30: AI as Second Reviewer (แทน peer review)
 
@@ -526,6 +530,61 @@ R2 (ทำเลย):
 
 ---
 
+#### 🆕 P-32: Structure-Read Gate (v3.2.0)
+
+**The bug pattern:** เขียน brief ที่ define/move/merge/delete component (tab/panel/function) โดยอ้าง handoff/memory/label แทนการอ่าน source จริง → mismatch, duplicate id, dropped panel.
+
+**Rule:** ก่อน spec/brief ที่แตะ component เดิม **อ่าน source body ของมัน session นี้** ทุก brief มี header `Structure verified:` ระบุ function/DOM ที่อ่าน + line number. Handoff/memory/doc = pointer ให้ไปอ่าน ไม่ใช่ตัวแทน. Brief ที่เขียนก่อน dependency merge ต้อง re-verify structure หลัง dependency ลง.
+
+#### 🆕 P-33: No-Regenerate / Encoding-Safe Edit Gate (v3.2.0)
+
+**The bug pattern:** regenerate ทั้งไฟล์ หรือ replace แบบไม่ระวัง → mojibake (Thai พัง), dropped panel, non-unique match แก้ผิดจุด.
+
+**Rule:** ห้าม regenerate — แก้ทีละจุด. Python replacement script:
+- อ่าน `open(p,'r',encoding='utf-8',newline='').read()`
+- assert `str.count(old)==1` ก่อน replace แต่ละครั้ง (abort ถ้า match ไม่ unique)
+- เขียน `open(p,'w',encoding='utf-8',newline='')`
+→ CRLF preserved, no BOM, Thai integrity intact.
+
+#### 🆕 P-34: Nova-Reference Byte-Diff Acceptance Gate (v3.2.0, proven 3/3)
+
+**The bug pattern:** เชื่อ metric ที่ coding agent report เอง = accept งานที่อาจพัง.
+
+**Rule:** acceptance เดียวที่เชื่อได้ = Nova อ่าน source จริง → apply edit เข้า reference ของตัวเอง → verify (bytes / CRLF / lone-LF / brace balance / `node --check` / content assert) → **`cmp -s` ไฟล์ที่ agent ส่ง เทียบ reference**. Metric ที่ agent report = claim ต้องตรวจ ไม่ใช่ acceptance. R2/R3/R4 ออกมา byte-identical ทั้งหมด.
+- pre-build reference **ก่อน** handoff (target byte count อยู่ใน brief, รอด /tmp reset — rebuild จาก committed base ได้)
+- independent brief pre-verify เป็น chain ได้ (R3 บน ref R2, R4 บน ref R3) แต่ byte-diff **แยกทีละ delivery** เพื่อ localise mismatch
+- **chip→section reminder:** เวลา chip ย้ายออกจาก Log Entry ให้ id `*-date`/`*-time`/`*-notes` ของตัวเอง แล้วส่งเข้า `getTimestampFrom(dateId,timeId)` — ไม่สร้าง helper ใหม่
+
+#### 🆕 P-35: Coding-Agent Env-Note Header (v3.2.0)
+
+**The bug pattern:** agent env ต่างจาก Nova → เสียหลาย turn หา tool + fight quote escaping.
+
+**Rule:** ทุก brief มี header "⚙️ Agent env — read FIRST": save script เป็น `.py` file + run `py` (ไม่ใช่ `python -c` one-liner), skip `node --check` (Nova ทำเอง), PowerShell fallback = `[IO.File]::WriteAllText` + `[System.Text.UTF8Encoding]::new($false)` (BOM-free, CRLF-safe, Thai-safe — verified byte-identical R2/R3/R4).
+
+> **หมายเหตุ numbering:** P-32/P-33 (Structure-Read, Encoding-Safe) ในหน่วยความจำการทำงานเคยอ้างเป็น P-31/P-32 — แต่ที่นี่ P-31 ถูกใช้โดย Reversibility แล้ว จึงเลื่อนเป็น P-32/P-33. **อ้างอิงใน brief ด้วยชื่อ** (Structure-Read Gate / Encoding-Safe Edit Gate) เพื่อกัน number drift.
+
+#### 🆕 P-36: Goal-Lock & Minimal Footprint (v3.2.0, ALWAYS ON)
+
+**The bug pattern:** Two failure modes from real incidents:
+- (A) **Perfecting the wrong thing** — polishing a sub-part while drifting from the actual goal.
+- (B) **Scope creep** — pulling in deps/domains/accounts/infra beyond what the task needs.
+
+**Rules (run before writing any proposal):**
+
+1. **GOAL-LOCK.** Before proposing architecture, plan, or a "phase": restate the ORIGIN goal in one line, from the user's own first framing. Check the proposal against it. If a step optimizes something that is NOT the origin goal → STOP and say so.
+
+2. **NO SILENT DEFERRAL OF THE CORE.** If the origin goal names a capability (e.g. "automation", "cross-tool"), that capability is CORE. You may sequence it later ONLY as a NAMED, scheduled phase with the decision already made — never quietly reclassified as "Tier 2 / someday" while a lesser version is built as if it were the goal.
+
+3. **SIMPLEST-CORRECT STANDS.** Prefer the simplest mechanism that MEETS the bar. A correct-but-simpler option may be rejected ONLY by naming a CONCRETE failure it has. A vague dismissal ("not real X", "not robust enough", "not secure enough") without the specific hole IS the error — the simple option stands.
+
+4. **FOOTPRINT DECLARATION.** Before proposing ANY infra/dep/hosting/auth/domain, state: (a) what it adds, (b) whether an existing primitive already covers it, (c) what else it couples to. If it couples to an UNRELATED project → STOP, redesign. Each project's blast radius stays contained to itself. Cross-project sharing is a NAMED decision, never a default reached for out of convenience.
+
+5. **COST-LOCK** (when the user sets a cost bound). Verify the actual pricing/free-tier of every proposed service against the bound BEFORE committing — from current docs, not memory. State how the bound is guaranteed (e.g. "free plan blocks rather than bills"), not just "probably cheap."
+
+**TRIGGER:** every time you propose architecture, a plan, a phase, auth, hosting, a dependency, or a "we'll do X later." Run rules 1-5 before writing the proposal.
+
+**WHY:** a session drifted into building a manual-first note store (the goal was automation), and separately dismissed a simple bearer-token auth as "not real auth" — which cascaded into Cloudflare Access → a custom-domain requirement → nearly coupling a standalone repo to an unrelated product's domain. Both failures share one root: not re-checking each step against the origin goal and the minimal footprint.
+
 ## 📦 Standard Files for Every Project
 
 ```
@@ -598,14 +657,13 @@ R2 (ทำเลย):
 - [ ] Signing key backup
 
 ### 🆕 Privacy (P-28) — ถ้ามี user data
-- [ ] `npx pdpa-guard .` ผ่าน (region, security rules เปิดกว้าง, PII fields, subprocessors — https://npmjs.com/package/pdpa-guard)
 - [ ] Data minimization audited
 - [ ] Consent flow + log working
 - [ ] Right to access/deletion implemented
 - [ ] Data residency ตรง law
 
 ### Process
-- [ ] Spec → Plan → Tasks artifacts ครบ (P-29)
+- [ ] Spec → Plan → Tasks artifacts ครบ (P-29, `/clarify` = Grilling round เสร็จ + confirmed)
 - [ ] Second-pass AI review ทำแล้ว (P-30)
 - [ ] CAPTURE_LOG updated
 
@@ -644,6 +702,8 @@ R2 (ทำเลย):
 
 > 🆕 **"Specs are the new code. The code is just the output."**
 
+> 🆕 **"Ask the whole frontier, wait for the answer, never act until the tree is settled."** (Grilling, P-29)
+
 ---
 
 ## 📚 §10 — Acknowledgements & Source Synthesis
@@ -677,6 +737,8 @@ Codex v3.0 สังเคราะห์จาก:
    
    These concepts addressed behavioral gaps in earlier Codex versions that focused primarily on technical patterns. Builder Codex is now a synthesis of: incident-derived technical patterns (P-01..P-30) + behavioral guardrails from somnus0x's work + 2026 industry standards.
 
+7. **🆕 Grilling method (v3.3.0):** `mattpocock/skills` (Matt Pocock) — ต้นทางของ `grilling` skill (design tree + frontier rounds). `utarn/engineer-skills` — fork ที่ต่อยอดเป็น `grill-me`/`grill-with-docs`/`grill-novice` + `handoff` + `domain-modeling`/CONTEXT.md — เป็นที่มาของการ formalize `/clarify` step ใน P-29. (P-38 Domain Language / P-39 Handoff Compaction candidates ยังพักไว้ session หน้า — source เดียวกัน)
+
 Codex นี้เป็น **living document** — ต้องผ่าน Compounding Loop ของตัวเองเพื่อให้คุ้มค่าใช้งานในระยะยาว
 
 ---
@@ -685,6 +747,9 @@ Codex นี้เป็น **living document** — ต้องผ่าน Com
 
 | Version | Date | Highlights |
 |---|---|---|
+| **v3.3.0 (Grilling Edition)** | 2026-09-24 | P-29's `/clarify` step formalized with the Grilling method (design tree + frontier rounds, numbered question + recommended answer, agent-finds-facts) — source: `mattpocock/skills`, extended by `utarn/engineer-skills`. Real incident anchor: Session 8 Nova counter-propose ("Option A++") instead of answering as asked. Trimmed the 8-slash-command box + OpenSpec 3-phase description to net-offset the addition (Growth Discipline). **P-37 candidate number retired** — folded into P-29 instead of standalone. Provenance correction: earlier capture attributed grilling to utarn; primary source is mattpocock, utarn is a fork that extends it. |
+| **v3.2.0 (Nova Loop)** | 2026-08-06 | + P-32 Structure-Read Gate; + P-33 No-Regenerate/Encoding-Safe Edit Gate; + P-34 Nova-Reference Byte-Diff Acceptance Gate; + P-35 Coding-Agent Env-Note Header; chip→section timestamp pattern folded into P-34 |
+| **v3.2.0 (Structural Integrity Edition)** | 2026-09-23 | + P-32 Structure-Read Gate (from Pippa B-1 mischaracterization incident 2026-07-20); + P-33 No-Regenerate / Encoding-Safe Edit Gate (from Pippa B-1b Antigravity mojibake scare 2026-07-21); + P-34 Nova-Reference Byte-Diff Acceptance Gate (proven 3/3 on R2/R3/R4 deliveries); + P-35 Coding-Agent Env-Note Header (cross-tool env portability); + P-36 Goal-Lock & Minimal Footprint / ALWAYS ON (from cross-tool session drift incident) |
 | **v3.1.0 (Behavioral Guardrails)** | 2026-06-22 | + 4 AI Misbehaviors Framework (เดา/โกหก/ทำเกิน/ลืม) ใน Executive Summary; + P-31 R0/R1/R2 Reversibility Classification; + MEMORY.md template (AI's failure log, แยกจาก CAPTURE_LOG); + project-level spec.md template (Architecture/Done/Todo/Current state); + Data Contracts block ใน AGENTS.md; + File Job Clarification section; credit somnus0x/agt-skill-pack ใน §10 |
 | v3.0.1 | 2026-06-20 | + CAPTURE_LOG.md template with real examples; + DR_PLAN.md with 7 scenarios |
 | **v3.0 (Solo-Survival Edition)** | 2026-06-20 | + Three-Tier file architecture (AGENTS/SKILL/Codex); + P-23 Hallucination Guardrails; + P-24 Backup Discipline; + P-25 Cost/Token Budget; + P-26 Context Management; + P-27 Mobile Store; + P-28 PDPA; + P-29 Spec-Driven Artifacts; + P-30 AI Second Reviewer; condensed P-01..P-22; expanded §10 with 2026 standards landscape |
