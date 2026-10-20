@@ -23,7 +23,7 @@ Every pattern maps to combating one of these:
 | Misbehavior | Symptom | Combat patterns |
 |---|---|---|
 | **เดา** (Guess) | Hallucinate imports/APIs, invent fields | P-23, P-32 |
-| **โกหก** (Lie) | Claim "fixed" without proving | P-34, debugging-discipline |
+| **โกหก** (Lie) | Claim "fixed" without proving; checker green, reality red | P-34, P-40, debugging-discipline |
 | **ทำเกิน** (Overreach) | Scope creep, refactor uninvited | P-21, P-31, P-36 |
 | **ลืม** (Forget) | Repeat past mistakes | MEMORY.md, CAPTURE_LOG, P-26 |
 
@@ -110,7 +110,11 @@ Plan (read Codex + Capture Log) → Work (per plan) → Review (verify) → Comp
   4. Footprint declaration before any infra/dep/hosting/auth/domain
   5. Cost-lock: verify pricing vs bound BEFORE commit
 
-### Grilling Method (v3.3.0 🆕 — folded into P-29, not a standalone number)
+### Reality-Touch (v3.4.0 🆕)
+
+- **P-40** — Reality-Touch Verification: (1) every verification ends with ≥1 check against the real live thing, expected result stated first — mock/harness/parser = rehearsal, probes use the real client's wire format; (2) platform-behaviour claims are verified or labelled `UNVERIFIED ASSUMPTION`; (3) mutation pass — delete each guard, the suite must go red.
+
+### Grilling Method (v3.3.0 — folded into P-29, not a standalone number)
 
 - **Design tree** — every decision branches into the decisions hanging off it
 - **Frontier** — only ask decisions whose prerequisites are already settled
@@ -149,6 +153,7 @@ features/{XYZ}/SPEC.md          — Per-feature specs (≠ project-level spec.md
 - "If certain about cause without measuring — that certainty IS the bug." (debugging-discipline)
 - "Byte-diff, not metric-report." (P-34)
 - "Goal-lock before proposal." (P-36)
+- "A mock only repeats its author's belief." (P-40)
 - "Ask the whole frontier, wait for the answer, never act until the tree is settled." (Grilling, P-29)
 
 ---
@@ -165,4 +170,4 @@ Otherwise: THIS INDEX IS ENOUGH.
 
 ---
 
-*Executive Index generated from Builder Codex v3.3.0 (2026-09-24). Update when new patterns promote or old patterns deprecate. Index and Master must stay in sync.*
+*Executive Index generated from Builder Codex v3.4.0 (2026-10-21). Update when new patterns promote or old patterns deprecate. Index and Master must stay in sync.*

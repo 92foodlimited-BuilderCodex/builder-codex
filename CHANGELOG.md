@@ -1,5 +1,34 @@
 # Changelog
 
+## [3.4.0] - 2026-10-21 — Reality-Touch Edition
+
+### Added
+
+- **P-40: Reality-Touch Verification** — (1) touch reality once: every verification ends with ≥1 check against the real live thing, expected result stated first; mock / harness / parser = rehearsal, and probes use the real client's wire format; (2) label beliefs: platform-behaviour claims are verified against the real service or marked `UNVERIFIED ASSUMPTION`; (3) prove the checker can fail: mutation pass on guard / auth / concurrency tests
+
+### Real incident anchor (4 incidents, same root, one week — order app)
+
+- 2026-10-15: deploy block "finished" but the push never happened → owner tested the old build
+- 2026-10-15: PowerShell block parsed clean, broke when pasted (scoping, encoding, clipboard)
+- 2026-10-16: probe used `Invoke-WebRequest -Form` (multipart unlike a browser) → would have rolled back a healthy Worker; caught by a harness run
+- 2026-10-21: harness mock DB answered 401 to a broken token because the AI believed it would; the real DB answered 200 — caught by the one real-service check in the block. Same session: a mutation pass exposed a test that stayed green with its guard deleted
+
+### Changed (Growth Discipline offset)
+
+- `BUILDER_CODEX.md` header keeps only the two latest version highlights (v3.2.0 detail lives in the Changelog)
+- The two v3.2.0 rows of the Changelog table (same release) merged into one
+- 4 AI Misbehaviors table: **โกหก** now maps to P-34 + P-40; P-23 and the Pre-Deployment checklist sandbox lines point to P-40 (rewritten in place, no new lines)
+
+### Numbering
+
+- P-37 stays retired, P-38 / P-39 stay parked candidates → new pattern is **P-40**. Reference it by name (Reality-Touch Verification) to avoid number drift.
+
+### Not in this release
+
+- `template/` (npm bundle) and `package.json` version are untouched — they are re-synced at the next npm release
+
+---
+
 ## [3.3.0] - 2026-09-24 — Grilling Edition
 
 ### Added (from `mattpocock/skills`, extended by `utarn/engineer-skills`)

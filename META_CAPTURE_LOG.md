@@ -29,10 +29,24 @@
 | 8 | 2026-06-25 | Concurrency skill discovery + friction analysis → hybrid workflow decision |
 | 9 | 2026-06-26/27 | debugging-discipline SKILL + AES rejection + Sprint pivot |
 | 10 | 2026-09-24 | Maintenance session: P-37 folded into P-29 (Grilling) → v3.3.0 |
+| 11 | 2026-10-21 | Maintenance session: P-40 Reality-Touch Verification graduated from project CAPTURE_LOG → v3.4.0 |
 
 ---
 
 ## Captures (Newest First)
+
+### 2026-10-21 — Maintenance Session: P-40 graduated from a project log (first use of the 3+ rule)
+
+- **Plan:** Tony asked to promote the recurring "checker PASS, reality FAIL" root cause into the Codex (raised by Nova in the order-app compounding loop)
+- **Win:**
+  - First pattern promoted by the project `CAPTURE_LOG.md` rule "same root cause 3+ times → graduate" — 4 incidents in 7 days, all incident-derived (no external source adopted → the Session 9 "expand instinct" rule does not apply)
+  - **P-32 dogfooded:** before editing, Nova read the master repo and found the order-app repo carries a stale `BUILDER_CODEX.md` v1.0 (P-01–P-22) — editing that copy would have forked the Codex. Edited the master here instead
+  - Growth Discipline: offset by trimming the header to the 2 latest highlights + merging the duplicate v3.2.0 changelog rows
+  - Numbering: P-37 retired, P-38/P-39 parked → P-40, referenced by name
+- **Loss:** the pattern itself was learned the expensive way — 4 times before graduating
+- **Question → Decision:** new number or fold into P-23 / P-34? → **new P-40** — P-23 is about AI-generated code, P-34 about agent self-reports; this one is about Nova's OWN checkers lying. P-23 / P-34 now point to it
+- **Codex pattern triggered:** P-32 Structure-Read (stale copy found), Growth Discipline, CAPTURE_LOG 3+ rule
+- **Next:** order-app repo `BUILDER_CODEX.md` v1.0 → replace with a pointer to the master (Tony's call); npm `template/` re-sync at next release
 
 ### 2026-09-24 — Maintenance Session: P-37 folded into P-29 (Grilling)
 

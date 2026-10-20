@@ -1,6 +1,6 @@
 # Builder Codex — Solo-Survival + Behavioral Guardrails + Structural Integrity Edition
 
-> **Standards bundle สำหรับ solo builder ที่ใช้ AI 100% ในการเขียนโค้ด** v3.3.0 (Grilling Edition) · 2026-09-24 · MIT-style license
+> **Standards bundle สำหรับ solo builder ที่ใช้ AI 100% ในการเขียนโค้ด** v3.4.0 (Reality-Touch Edition) · 2026-10-21 · MIT-style license
 
 ## เปิดอันไหนเมื่อไหร่
 
@@ -48,7 +48,11 @@ your-project/
         └── REVIEW.md
 ```
 
-## 🆕 What v3.3.0 Adds
+## 🆕 What v3.4.0 Adds
+
+**P-40 Reality-Touch Verification** — เครื่องมือตรวจเขียวไม่ได้แปลว่าของจริงผ่าน: ทุก verification ต้องแตะของจริงอย่างน้อย 1 จุด · claim เรื่องพฤติกรรม platform ต้อง verify หรือติดป้าย `UNVERIFIED ASSUMPTION` · test ของ guard/auth ต้องผ่าน mutation pass (ลบ guard แล้วต้องแดง). ดู `BUILDER_CODEX.md` § P-40
+
+## What v3.3.0 Added
 
 `/clarify` step ของ P-29 (Spec-Driven Workflow) ตอนนี้มี mechanism จริงแทนคำแนะนำลอยๆ — **Grilling method** (ต้นทาง `mattpocock/skills`, ต่อยอดโดย `utarn/engineer-skills`):
 

@@ -8,10 +8,10 @@ description: Apply Builder Codex patterns for AI-assisted solo development — r
 
 > **เอกสารหลัก** สำหรับทุกคนที่ build ด้วย AI 100% (vibe coding / agentic coding) — ข้าม project, ข้าม tech stack, ข้าม AI tool
 >
-> **เวอร์ชัน:** 3.3.0 (Grilling Edition)
-> **อัพเดทล่าสุด:** 2026-09-24
+> **เวอร์ชัน:** 3.4.0 (Reality-Touch Edition)
+> **อัพเดทล่าสุด:** 2026-10-21
+> **v3.4.0 highlights:** + P-40 Reality-Touch Verification — graduated from 4 same-root incidents in one week (checker PASS, reality FAIL). Numbers P-37 (retired) and P-38/P-39 (parked) are skipped on purpose.
 > **v3.3.0 highlights:** P-29's `/clarify` step formalized with the Grilling method (design tree + frontier rounds, numbered question + recommended answer, agent-finds-facts) — จาก `mattpocock/skills`, ต่อยอดโดย `utarn/engineer-skills`. Real incident anchor: Session 8 Nova counter-propose แทนตอบตามที่ขอ. P-37 candidate number retired — folded into P-29 แทนเปิดเลขใหม่ (Growth Discipline: ตัด slash-command box + OpenSpec 3-phase ให้สั้นลงชดเชย)
-> **v3.2.0 highlights:** Pattern P-32 → P-36 (Structure-Read, Encoding-Safe, Nova-Reference Byte-Diff, Env-Note, Goal-Lock) — เกิดจากบทเรียนจริง Pippa B-1/B-1b + cross-tool session drift
 > **ที่มา:** สังเคราะห์จากบทเรียนจริงของ solo builder หลาย sprint + เทียบกับ 2026 standards (AGENTS.md Linux Foundation, Anthropic SKILL spec, Spec-Driven Development, Claude Code memory hierarchy) — ดู §10
 > **Applies to:** ทุก project ที่ใช้ AI agent เขียนโค้ดเป็นหลัก — ไม่ว่าจะเป็น single-file app, multi-file repo, mobile app, หรือ cross-platform
 > **เพิ่มใน v3.0:** Pattern P-23 → P-30 สำหรับ Solo Builder (hallucination, backup, cost, context, mobile, PDPA, spec workflow, AI reviewer) + Three-tier file architecture (AGENTS.md / SKILL.md / Codex master)
@@ -66,7 +66,7 @@ description: Apply Builder Codex patterns for AI-assisted solo development — r
 | พฤติกรรม | Code-level symptom | Pattern ที่กัน |
 |---|---|---|
 | **เดา** (Guess) | Hallucinated imports/APIs, สร้าง field/method ที่ไม่มี | P-23, NO MAGIC rule |
-| **โกหก** (Lie) | "เสร็จแล้ว" โดยไม่ verify, ไม่ run จริง | VERIFY BEFORE DONE rule |
+| **โกหก** (Lie) | "เสร็จแล้ว" โดยไม่ verify, ไม่ run จริง, tool เขียวแต่ของจริงพัง | VERIFY BEFORE DONE rule, P-34, P-40 |
 | **ทำเกิน** (Overreach) | Scope creep, refactor ที่ไม่ได้ขอ, "ขอเพิ่มอีกนิด" | P-21, SCOPE DRIFT rule, P-31 |
 | **ลืม** (Forget) | Session ถัดไปไม่รู้บริบท, repeat bug เดิม | MEMORY.md, CAPTURE_LOG, P-26 |
 
@@ -264,7 +264,7 @@ Coordination: single flag `notified: true/false` + atomic claim ก่อนส�
 ```
 [ ] ทุก import / require ตรวจมีอยู่จริงใน package registry (npm/pip)
 [ ] ทุก API method ตรวจกับ docs ของ provider (ไม่ใช่ AI tell-me)
-[ ] Run โค้ดอย่างน้อย 1 รอบใน sandbox ก่อน commit
+[ ] Run โค้ดอย่างน้อย 1 รอบใน sandbox ก่อน commit — sandbox ผ่าน ≠ ของจริงผ่าน (P-40)
 [ ] Schema (Firebase rules, DB column, API response) ตรวจกับ source จริง
 [ ] ถ้า AI อ้าง library ไม่คุ้น → search GitHub stars/last commit ก่อนใช้
 ```
@@ -590,6 +590,17 @@ R2 (ทำเลย):
 
 **WHY:** a session drifted into building a manual-first note store (the goal was automation), and separately dismissed a simple bearer-token auth as "not real auth" — which cascaded into Cloudflare Access → a custom-domain requirement → nearly coupling a standalone repo to an unrelated product's domain. Both failures share one root: not re-checking each step against the origin goal and the minimal footprint.
 
+#### 🆕 P-40: Reality-Touch Verification (v3.4.0)
+
+**The bug pattern:** เครื่องมือตรวจบอก PASS แต่ของจริง FAIL — parser / harness / mock / "block รันจบ" พิสูจน์ได้แค่สิ่งที่คนเขียนมันเชื่ออยู่แล้ว. 4 incidents จริงใน 1 สัปดาห์ (order app, 2026-10-15 → 10-21): deploy block "รันจบ" แต่ push ไม่เกิด · PowerShell block parse ผ่านแต่พังตอน paste · probe ส่ง multipart คนละ format กับ browser จริง (เกือบ rollback ระบบที่ไม่ได้พัง) · mock DB ตอบ 401 กับ token เสียเพราะ AI เชื่อแบบนั้น — DB จริงตอบ 200.
+
+**Rules:**
+1. **Touch reality once.** ทุก verification จบด้วย ≥1 check กับของจริง (live URL / real API / real device) + บอก expected result ก่อนรัน. Mock / harness / parser = ซ้อม ไม่ใช่ acceptance. Probe ต้องส่ง wire format เดียวกับ client จริง.
+2. **Label beliefs.** Check ที่อ้างพฤติกรรมของ platform (Google, Firebase, Cloudflare, store review…) → verify กับ service จริง หรือเขียนกำกับ `UNVERIFIED ASSUMPTION` ใน brief/doc.
+3. **Prove the checker can fail.** ก่อนเชื่อ test ของ guard / auth / concurrency code: ลบ guard ทีละตัว → suite ต้องแดง (mutation pass). Test ที่ยังเขียวตอน guard หาย = ของประดับ.
+
+**Combats:** โกหก (Lie) — ไม่ได้ตั้งใจ: tool บอกเขียว แล้ว AI พูดตาม. **Pairs with:** P-34 (byte-diff งานของ agent), debugging-discipline (วัดก่อนสรุป cause).
+
 ## 📦 Standard Files for Every Project
 
 ```
@@ -645,7 +656,7 @@ R2 (ทำเลย):
 ### 🆕 AI Output Quality (P-23)
 - [ ] Imports ทุกตัวตรวจมีจริงใน registry
 - [ ] API methods ตรวจกับ provider docs (ไม่ใช่ AI tell-me)
-- [ ] Run + verify ใน sandbox อย่างน้อย 1 รอบ
+- [ ] Run ใน sandbox + ≥1 check กับของจริง; checker พิสูจน์แล้วว่าจับ fail ได้ (P-40)
 - [ ] Lint + type check pass
 
 ### 🆕 Solo Survival (P-24, P-25)
@@ -709,6 +720,8 @@ R2 (ทำเลย):
 
 > 🆕 **"Ask the whole frontier, wait for the answer, never act until the tree is settled."** (Grilling, P-29)
 
+> 🆕 **"A mock only repeats its author's belief."** Touch reality once. (P-40)
+
 ---
 
 ## 📚 §10 — Acknowledgements & Source Synthesis
@@ -752,9 +765,9 @@ Codex นี้เป็น **living document** — ต้องผ่าน Com
 
 | Version | Date | Highlights |
 |---|---|---|
+| **v3.4.0 (Reality-Touch Edition)** | 2026-10-21 | + P-40 Reality-Touch Verification (touch reality once · label platform beliefs · mutation pass) — first pattern graduated by the CAPTURE_LOG "same root cause 3+ times" rule (4 incidents, order app, 2026-10-15 → 10-21). Offset: header keeps the 2 latest highlights; the two v3.2.0 changelog rows merged into one. |
 | **v3.3.0 (Grilling Edition)** | 2026-09-24 | P-29's `/clarify` step formalized with the Grilling method (design tree + frontier rounds, numbered question + recommended answer, agent-finds-facts) — source: `mattpocock/skills`, extended by `utarn/engineer-skills`. Real incident anchor: Session 8 Nova counter-propose ("Option A++") instead of answering as asked. Trimmed the 8-slash-command box + OpenSpec 3-phase description to net-offset the addition (Growth Discipline). **P-37 candidate number retired** — folded into P-29 instead of standalone. Provenance correction: earlier capture attributed grilling to utarn; primary source is mattpocock, utarn is a fork that extends it. |
-| **v3.2.0 (Nova Loop)** | 2026-08-06 | + P-32 Structure-Read Gate; + P-33 No-Regenerate/Encoding-Safe Edit Gate; + P-34 Nova-Reference Byte-Diff Acceptance Gate; + P-35 Coding-Agent Env-Note Header; chip→section timestamp pattern folded into P-34 |
-| **v3.2.0 (Structural Integrity Edition)** | 2026-09-23 | + P-32 Structure-Read Gate (from Pippa B-1 mischaracterization incident 2026-07-20); + P-33 No-Regenerate / Encoding-Safe Edit Gate (from Pippa B-1b Antigravity mojibake scare 2026-07-21); + P-34 Nova-Reference Byte-Diff Acceptance Gate (proven 3/3 on R2/R3/R4 deliveries); + P-35 Coding-Agent Env-Note Header (cross-tool env portability); + P-36 Goal-Lock & Minimal Footprint / ALWAYS ON (from cross-tool session drift incident) |
+| **v3.2.0 (Structural Integrity Edition)** | 2026-08-06 → 09-23 | chip→section timestamp pattern folded into P-34; + P-32 Structure-Read Gate (from Pippa B-1 mischaracterization incident 2026-07-20); + P-33 No-Regenerate / Encoding-Safe Edit Gate (from Pippa B-1b Antigravity mojibake scare 2026-07-21); + P-34 Nova-Reference Byte-Diff Acceptance Gate (proven 3/3 on R2/R3/R4 deliveries); + P-35 Coding-Agent Env-Note Header (cross-tool env portability); + P-36 Goal-Lock & Minimal Footprint / ALWAYS ON (from cross-tool session drift incident) |
 | **v3.1.0 (Behavioral Guardrails)** | 2026-06-22 | + 4 AI Misbehaviors Framework (เดา/โกหก/ทำเกิน/ลืม) ใน Executive Summary; + P-31 R0/R1/R2 Reversibility Classification; + MEMORY.md template (AI's failure log, แยกจาก CAPTURE_LOG); + project-level spec.md template (Architecture/Done/Todo/Current state); + Data Contracts block ใน AGENTS.md; + File Job Clarification section; credit somnus0x/agt-skill-pack ใน §10 |
 | v3.0.1 | 2026-06-20 | + CAPTURE_LOG.md template with real examples; + DR_PLAN.md with 7 scenarios |
 | **v3.0 (Solo-Survival Edition)** | 2026-06-20 | + Three-Tier file architecture (AGENTS/SKILL/Codex); + P-23 Hallucination Guardrails; + P-24 Backup Discipline; + P-25 Cost/Token Budget; + P-26 Context Management; + P-27 Mobile Store; + P-28 PDPA; + P-29 Spec-Driven Artifacts; + P-30 AI Second Reviewer; condensed P-01..P-22; expanded §10 with 2026 standards landscape |
